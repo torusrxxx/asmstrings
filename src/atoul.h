@@ -17,7 +17,8 @@ inline unsigned long sse42_atoul(const char* str)
     d = _mm_sub_epi8(d, check);
     d = _mm_maddubs_epi16(d, _mm_set1_epi16(0x0A01));
     d = _mm_madd_epi16(d, _mm_set1_epi32(0x00640001));
-    d = _mm_mullo_epi32(d, _mm_setr_epi32(1, 10000, 1, 10000));
+    d = _mm_mullo_epi32(d, _mm_setr_epi32(1, 10000, 100000000, 0));
     d = _mm_hadd_epi32(d, d);
-    return _mm_extract_epi32(d, 0) + _mm_extract_epi32(d, 1) * 100000000;
+    d = _mm_hadd_epi32(d, d);
+    return _mm_extract_epi32(d, 0);
 }

@@ -7,7 +7,9 @@ Each function is included in a header file in "src" directory, without external 
 * conversion between decimal strings, hex and binary;
 * more...
 ## System requirements
-There are two tiers of instruction set support, SSE 4.2 and AVX2. SSE 4.2 introduced essential instructions fundamental to acceleration of string operations. AVX2 is used in some routines to further increase throughput.
+There are two tiers of instruction set support, SSE 4.2 and AVX 2.
+* SSE 4.2 introduced essential instructions fundamental to acceleration of string operations.
+* AVX 2 is used in some routines to further increase throughput. Bear in mind that AVX 2 causes some processors to slow down, which means your program may run slower with AVX 2.
 ## Licence
 I intend to release this library into the public domain. Just cut and paste into your project, enjoy the performance boost!
 ## Contributions

@@ -1,7 +1,7 @@
 #pragma once
 #include <intrin.h>
 
-inline void sse2_data2hex(const void* src, char* dest, int size) {
+inline void sse42_data2hex(const void* src, char* dest, int size) {
     const __m128i* srcptr = (const __m128i*)src;
     __m128i* destptr = (__m128i*)dest;
     __m128i nines = _mm_set1_epi8(9);
@@ -32,10 +32,11 @@ inline void sse2_data2hex(const void* src, char* dest, int size) {
         low = _mm_or_si128(low, temp);
 
         cmp_inv = _mm_cmpgt_epi8(low, nines); // compare, create mask
-        cmp = _mm_andnot_si128(cmp_inv, ones);
-        cmp = _mm_and_si128(cmp, zeros);
-        cmp_inv = _mm_and_si128(cmp_inv, as);
-        cmp = _mm_or_si128(cmp, cmp_inv);
+        //cmp = _mm_andnot_si128(cmp_inv, ones);
+        //cmp = _mm_and_si128(cmp, zeros);
+        //cmp_inv = _mm_and_si128(cmp_inv, as);
+        //cmp = _mm_or_si128(cmp, cmp_inv);
+        cmp = _mm_blendv_epi8(zeros, as, cmp_inv); // this may be slower
         low = _mm_adds_epi8(low, cmp); // add base character
 
         // repeat for high
@@ -46,10 +47,11 @@ inline void sse2_data2hex(const void* src, char* dest, int size) {
         high = _mm_or_si128(high, temp);
 
         cmp_inv = _mm_cmpgt_epi8(high, nines);
-        cmp = _mm_andnot_si128(cmp_inv, ones);
-        cmp = _mm_and_si128(cmp, zeros);
-        cmp_inv = _mm_and_si128(cmp_inv, as);
-        cmp = _mm_or_si128(cmp, cmp_inv);
+        //cmp = _mm_andnot_si128(cmp_inv, ones);
+        //cmp = _mm_and_si128(cmp, zeros);
+        //cmp_inv = _mm_and_si128(cmp_inv, as);
+        //cmp = _mm_or_si128(cmp, cmp_inv);
+        cmp = _mm_blendv_epi8(zeros, as, cmp_inv); //this may be slower
         high = _mm_adds_epi8(high, cmp);
 
         _mm_storeu_si128(destptr, low);
@@ -70,10 +72,11 @@ inline void sse2_data2hex(const void* src, char* dest, int size) {
     low = _mm_or_si128(low, temp);
 
     cmp_inv = _mm_cmpgt_epi8(low, nines); // compare, create mask
-    cmp = _mm_andnot_si128(cmp_inv, ones);
-    cmp = _mm_and_si128(cmp, zeros);
-    cmp_inv = _mm_and_si128(cmp_inv, as);
-    cmp = _mm_or_si128(cmp, cmp_inv);
+    //cmp = _mm_andnot_si128(cmp_inv, ones);
+    //cmp = _mm_and_si128(cmp, zeros);
+    //cmp_inv = _mm_and_si128(cmp_inv, as);
+    //cmp = _mm_or_si128(cmp, cmp_inv);
+    cmp = _mm_blendv_epi8(zeros, as, cmp_inv); //this may be slower
     low = _mm_adds_epi8(low, cmp); // add base character
 
     if (i < 8)
@@ -112,10 +115,11 @@ inline void sse2_data2hex(const void* src, char* dest, int size) {
     high = _mm_or_si128(high, temp);
 
     cmp_inv = _mm_cmpgt_epi8(high, nines);
-    cmp = _mm_andnot_si128(cmp_inv, ones);
-    cmp = _mm_and_si128(cmp, zeros);
-    cmp_inv = _mm_and_si128(cmp_inv, as);
-    cmp = _mm_or_si128(cmp, cmp_inv);
+    //cmp = _mm_andnot_si128(cmp_inv, ones);
+    //cmp = _mm_and_si128(cmp, zeros);
+    //cmp_inv = _mm_and_si128(cmp_inv, as);
+    //cmp = _mm_or_si128(cmp, cmp_inv);
+    cmp = _mm_blendv_epi8(zeros, as, cmp_inv); //this may be slower
     high = _mm_adds_epi8(high, cmp);
     destptr2 = (short*)destptr;
     if (i >= 4)
@@ -178,10 +182,7 @@ inline void avx2_data2hex(const void* src, char* dest, int size) {
         low2 = _mm256_or_si256(low2, temp2);
 
         cmp_inv2 = _mm256_cmpgt_epi8(low2, nines2); // compare, create mask
-        cmp2 = _mm256_andnot_si256(cmp_inv2, ones2);
-        cmp2 = _mm256_and_si256(cmp2, zeros2);
-        cmp_inv2 = _mm256_and_si256(cmp_inv2, as2);
-        cmp2 = _mm256_or_si256(cmp2, cmp_inv2);
+        cmp2 = _mm256_blendv_epi8(zeros2, as2, cmp_inv2);
         low2 = _mm256_adds_epi8(low2, cmp2); // add base character
 
         _mm256_storeu_si256(destptr256, low2);
@@ -203,10 +204,7 @@ inline void avx2_data2hex(const void* src, char* dest, int size) {
     low2 = _mm256_or_si256(low2, temp2);
 
     cmp_inv2 = _mm256_cmpgt_epi8(low2, nines2); // compare, create mask
-    cmp2 = _mm256_andnot_si256(cmp_inv2, ones2);
-    cmp2 = _mm256_and_si256(cmp2, zeros2);
-    cmp_inv2 = _mm256_and_si256(cmp_inv2, as2);
-    cmp2 = _mm256_or_si256(cmp2, cmp_inv2);
+    cmp2 = _mm256_blendv_epi8(zeros2, as2, cmp_inv2);
     low2 = _mm256_adds_epi8(low2, cmp2); // add base character
 
     __m128i low = _mm256_castsi256_si128(low2);
